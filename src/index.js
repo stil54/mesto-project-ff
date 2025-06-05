@@ -9,7 +9,7 @@ import avatar from './images/avatar.jpg';
 
 
 import {initialCards} from "./components/cards.js"
-import {createCard, deletedCard} from "./components/card.js"
+import {createCard, deletedCard, likeButton} from "./components/card.js"
 
 // Добавляем логотип и аватар
 document.querySelector('.header__logo').src = logo;
@@ -20,9 +20,9 @@ const cardTemplate = document.querySelector("#card-template").content;
 const cardList = document.querySelector(".places__list");
 
 
-// @todo: Вывести карточки на страницу
+// Вывести карточки на страницу
 initialCards.forEach(({ name, link }) => {
-    const cardData = createCard(cardTemplate, name, link, deletedCard);
+    const cardData = createCard(cardTemplate, name, link, deletedCard, likeButton);
     cardList.append(cardData);
 });
 
