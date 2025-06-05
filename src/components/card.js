@@ -1,33 +1,28 @@
-// Функция создания карточки
-export function createCard(cardTemplate, link, name, imageModal, deletedCard, likeButton, openImage) {
-    const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
-    const cardImage = cardElement.querySelector(".card__image")
-    const like = cardElement.querySelector(".card__like-button");
+export function createCard({ template, data, handlers }) {
+  const cardElement = template.querySelector(".card").cloneNode(true);
+  const cardImage = cardElement.querySelector(".card__image");
+  const likeButton = cardElement.querySelector(".card__like-button");
+  const deleteButton = cardElement.querySelector(".card__delete-button");
 
-    cardElement.querySelector(".card__title").textContent = name;
-    cardImage.src = link;
-    cardImage.alt = name;
+  // Заполнение данными
+  cardElement.querySelector(".card__title").textContent = data.name;
+  cardImage.src = data.link;
+  cardImage.alt = data.name;
 
-    cardElement.querySelector(".card__delete-button").addEventListener("click", () => {
-        deletedCard(cardElement);
-    });
+  // Обработчики событий
+  deleteButton.addEventListener("click", () => deleteCard(cardElement));
+  likeButton.addEventListener("click", handlers.like);
+  cardImage.addEventListener("click", handlers.image);
 
-    like.addEventListener('click', likeButton);
-
-    cardImage.addEventListener('click', () => 
-        openImage(imageModal, link, name)
-    );
-
-    return cardElement;
+  return cardElement;
 }
 
-// Функция удаления карточки
-export function deletedCard(card) {
-    card.remove();
-
+// Функции работы с карточками
+export function deleteCard(cardElement) {
+  cardElement.remove();
 }
 
 // Функция обработки лайка
-export function likeButton(event) {
-    event.target.classList.toggle('card__like-button_is-active');
-};
+export function likeCard(event) {
+  event.target.classList.toggle("card__like-button_is-active");
+}
