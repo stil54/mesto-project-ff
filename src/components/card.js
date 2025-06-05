@@ -1,26 +1,30 @@
 // Функция создания карточки
-export function createCard(cardTemplate, cardTitle, cardimage, deletedCard, likeButton) {
+export function createCard(cardTemplate, link, name, imageModal, deletedCard, likeButton, openImage) {
     const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
+    const cardImage = cardElement.querySelector(".card__image")
     const like = cardElement.querySelector(".card__like-button");
 
-    cardElement.querySelector(".card__title").textContent = cardTitle;
-    cardElement.querySelector(".card__image").src = cardimage;
-    cardElement.querySelector(".card__image").alt = cardTitle;
+    cardElement.querySelector(".card__title").textContent = name;
+    cardImage.src = link;
+    cardImage.alt = name;
 
-    const deleteButton = cardElement.querySelector(".card__delete-button");
-    deleteButton.addEventListener("click", (event) => {
-        deletedCard(event);
+    cardElement.querySelector(".card__delete-button").addEventListener("click", () => {
+        deletedCard(cardElement);
     });
 
     like.addEventListener('click', likeButton);
+
+    cardImage.addEventListener('click', () => 
+        openImage(imageModal, link, name)
+    );
 
     return cardElement;
 }
 
 // Функция удаления карточки
-export function deletedCard(event) {
-    const listItem = event.target.closest(".card");
-    listItem.remove();
+export function deletedCard(card) {
+    card.remove();
+
 }
 
 // Функция обработки лайка
