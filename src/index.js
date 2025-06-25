@@ -11,6 +11,7 @@ import avatar from "./images/avatar.jpg";
 import { initialCards } from "./components/cards.js";
 import { createCard, likeCard, deleteCard } from "./components/card.js";
 import { initPopups, openPopup, closePopup } from "./components/modal.js";
+import { enableValidation, clearValidation } from './components/validation.js';
 
 // DOM элементы
 const elements = {
@@ -43,8 +44,19 @@ const inputs = {
   imageLink: forms.addCard.querySelector(".popup__input_type_url"),
 };
 
+const validationConfig = {  
+  formSelector: '.popup__form',  
+  inputSelector: '.popup__input',  
+  submitButtonSelector: '.popup__button',  
+  inactiveButtonClass: 'popup__button_disabled',  
+  inputErrorClass: 'popup__input_type_error',  
+  errorClass: 'popup__error_visible'  
+};
+
+
 // Инициализация приложения
 function init() {
+  enableValidation(validationConfig); 
   setupUI();
   initPopups();
   renderInitialCards();
@@ -91,9 +103,11 @@ function setupEventListeners() {
   forms.editProfile.addEventListener("submit", handleEditSubmit);
 
   // Добавление карточки
-  elements.addButton.addEventListener("click", () =>
-    openPopup(elements.addModal)
-  );
+  elements.addButton.addEventListener("click", () => {
+    forms.addCard.reset();
+    clearValidation(forms.addCard, validationConfig);
+    openPopup(elements.addModal);
+  });
   forms.addCard.addEventListener("submit", handleAddCardSubmit);
 }
 
@@ -101,6 +115,7 @@ function setupEventListeners() {
 function handleEditClick() {
   inputs.name.value = elements.name.textContent;
   inputs.description.value = elements.job.textContent;
+  clearValidation(forms.editProfile, validationConfig);
   openPopup(elements.editModal);
 }
 
