@@ -229,7 +229,7 @@ function handleAddCardSubmit(evt) {
   newCardApi(name, link)
     .then((newCard) => {
       // Создаем и добавляем карточку из ответа сервера
-      console.log(newCard);
+
       const cardElement = createCardElement(newCard, currentUser._id);
       elements.cardList.prepend(cardElement);
 
