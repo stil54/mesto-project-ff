@@ -16,6 +16,7 @@ import {
   updateProfile,
   newCardApi,
   deleteCardApi,
+  updateAvatar,
 } from "./components/api.js";
 
 // DOM элементы
@@ -31,6 +32,11 @@ const elements = {
   addModal: document.querySelector(".popup_type_new-card"),
   name: document.querySelector(".profile__title"),
   job: document.querySelector(".profile__description"),
+  avatarPopup: document.querySelector('.popup_type_change-avatar'),
+  avatarForm: document.querySelector('.popup_type_change-avatar .popup__form'),
+  avatarInput: document.querySelector('#avatar-input'),
+  avatarImage: document.querySelector('.profile__image'),
+  avatarInputError: document.querySelector('.avatar-input-error')
 };
 
 // Формы
@@ -125,6 +131,15 @@ function setupEventListeners() {
     openPopup(elements.addModal);
   });
   forms.addCard.addEventListener("submit", handleAddCardSubmit);
+
+  // Обработчик клика по аватару
+  elements.avatarImage.addEventListener('click', () => {
+    openPopup(elements.avatarPopup);
+    clearValidation(elements.avatarForm, validationConfig);
+  });
+  
+  // Обработчик отправки формы аватара
+  elements.avatarForm.addEventListener('submit', handleAvatarSubmit);
 }
 
 // Обработчики событий
@@ -165,6 +180,37 @@ function handleEditSubmit(evt) {
       submitButton.textContent = originalText;
     });
 }
+
+
+//обработчик отправки формы смены аватара
+function handleAvatarSubmit(evt) {
+  evt.preventDefault();
+  
+  const submitButton = evt.submitter;
+  const originalText = submitButton.textContent;
+  const avatarLink = elements.avatarInput.value.trim();
+  
+  // UI feedback
+  submitButton.disabled = true;
+  submitButton.textContent = 'Сохранение...';
+  
+  updateAvatar(avatarLink)
+    .then((userData) => {
+      // Обновляем аватар из ответа сервера
+      elements.avatarImage.style.backgroundImage = `url(${userData.avatar})`;
+      closePopup(elements.avatarPopup);
+      elements.avatarForm.reset();
+    })
+    .catch((err) => {
+      console.error('Ошибка при обновлении аватара:', err);
+      elements.avatarInputError.textContent = 'Не удалось обновить аватар';
+      elements.avatarInputError.classList.add(validationConfig.errorClass);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    });
+};
 
 // Обработка добавления карточки
 function handleAddCardSubmit(evt) {

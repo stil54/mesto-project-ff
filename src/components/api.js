@@ -67,3 +67,11 @@ export const unlikeCardApi = (cardId) => {
     headers: config.headers,
   }).then(respHandel);
 };
+
+export const updateAvatar = (avatarLink) => {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
+    method: "PATCH",
+    headers: config.headers,
+    body: JSON.stringify({ avatar: avatarLink }),
+  }).then(respHandel);
+};

@@ -14,7 +14,12 @@
   </header>
   <main class="content">
     <section class="profile page__section">
-      <div class="profile__image"></div>
+      <div class="profile__image-container">  
+        <div class="profile__image" style="background-image: url('<%=require('./images/avatar.jpg')%>')"> 
+          <div class="profile__image-overlay"></div> 
+          <button class="profile__edit-avatar-button" type="button"></button>  
+        </div>
+      </div>
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
         <button class="profile__edit-button" type="button"></button>
@@ -32,13 +37,24 @@
       © 2021 Mesto Russia
     </p>
   </footer>
+  <div class="popup popup_type_change-avatar">
+    <div class="popup__content popup__content_content_avatar">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Обновить аватар</h3>
+      <form class="popup__form" name="change-avatar" novalidate>
+        <input id="avatar-input" type="url" name="avatar" class="popup__input" placeholder="Ссылка на новый аватар" required data-error="Введите корректный URL изображения.">  
+        <span class="avatar-input-error popup__input-error"></span>
+        <button type="submit" class="button popup__button">Сохранить</button>
+      </form>
+    </div>
+  </div>
   <div class="popup popup_type_edit">
     <div class="popup__content">
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Редактировать профиль</h3>
       <form class="popup__form" name="edit-profile" novalidate>
         <input id="name-input" type="text" name="name" class="popup__input popup__input_type_name" placeholder="Имя" required minlength="2" maxlength="40" data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы.">
-        <span class="name-input-error popup__input-error"></span>  
+        <span class="name-input-error popup__input-error"></span>
         <input id="description-input" type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" required minlength="2" maxlength="200" data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы.">
         <span class="description-input-error popup__input-error"></span>
         <button type="submit" class="button popup__button">Сохранить</button>
@@ -65,14 +81,14 @@
       <p class="popup__caption"></p>
     </div>
   </div>
-  <div class="popup popup_type_confirm">
-    <div class="popup__content">
-      <button class="popup__close" type="button"></button>
-      <h3 class="popup__title">Вы уверены?</h3>
-      <form class="popup__form">
-        <button class="popup__button" type="submit">Да</button>
-      </form>
-    </div>
+  <div class="popup popup_type_delete popup_type_confirm">  
+    <div class="popup__content popup__content_content_delete">  
+        <button type="button" class="popup__close"></button>  
+        <h3 class="popup__title">Вы уверены?</h3>
+        <form class="popup__form"></form>
+          <button id="confirm-delete" type="submit" class="button popup__button popup__button_delete">Да</button>  
+        </form>
+      </div>
   </div>
 </div>
 
@@ -83,8 +99,9 @@
     <div class="card__description">
       <h2 class="card__title">
       </h2>
-      <button type="button" class="card__like-button"></button>
-      <span class="card__like-count"></span></div>
+      <div class="wrap">
+        <button type="button" class="card__like-button"></button>
+        <span class="card__like-count"></span></div>
     </div>
   </li>
 </template>
