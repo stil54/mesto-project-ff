@@ -1,5 +1,5 @@
 const regex = /^[A-Za-zа-яА-ЯёЁ0-9ёЁ -]+$/;
-const urlRegex = /(http|https):\/\/[^\s/$.?#].[^\s]*/;
+const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
 const hasInvalidInput = (inputList) => {
   return inputList.some((inputElement) => {
@@ -52,13 +52,12 @@ const checkInputValidity = (formElement, inputElement, validationConfig) => {
 };
 
 const toggleButtonState = (inputList, buttonElement, validationConfig) => {
-  if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(validationConfig.inactiveButtonClass);
-  } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(validationConfig.inactiveButtonClass);
-  }
+  const isInvalid = hasInvalidInput(inputList);
+  buttonElement.disabled = isInvalid;
+  buttonElement.classList.toggle(
+    validationConfig.inactiveButtonClass,
+    isInvalid
+  );
 };
 
 const setEventListeners = (formElement, validationConfig) => {
@@ -70,7 +69,7 @@ const setEventListeners = (formElement, validationConfig) => {
   );
 
   inputList.forEach((inputElement) => {
-    inputElement.addEventListener("input", function () {
+    inputElement.addEventListener("input", () => {
       checkInputValidity(formElement, inputElement, validationConfig);
       toggleButtonState(inputList, buttonElement, validationConfig);
     });
@@ -83,10 +82,7 @@ export const enableValidation = (validationConfig) => {
   );
 
   formList.forEach((formElement) => {
-    formElement.addEventListener("submit", function (evt) {
-      evt.preventDefault();
-    });
-
+    formElement.addEventListener("submit", (evt) => evt.preventDefault());
     setEventListeners(formElement, validationConfig);
   });
 };

@@ -11,7 +11,8 @@ import avatar from "./images/avatar.jpg";
 import { initialCards } from "./components/cards.js";
 import { createCard, likeCard, deleteCard } from "./components/card.js";
 import { initPopups, openPopup, closePopup } from "./components/modal.js";
-import { enableValidation, clearValidation } from './components/validation.js';
+import { enableValidation, clearValidation } from "./components/validation.js";
+import { getUserInfo } from "./components/api.js";
 
 // DOM элементы
 const elements = {
@@ -44,20 +45,21 @@ const inputs = {
   imageLink: forms.addCard.querySelector(".popup__input_type_url"),
 };
 
-const validationConfig = {  
-  formSelector: '.popup__form',  
-  inputSelector: '.popup__input',  
-  submitButtonSelector: '.popup__button',  
-  inactiveButtonClass: 'popup__button_disabled',  
-  inputErrorClass: 'popup__input_type_error',  
-  errorClass: 'popup__error_visible'  
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
 };
 
+const userData = await getUserInfo();
 
 // Инициализация приложения
 function init() {
-  enableValidation(validationConfig); 
-  setupUI();
+  enableValidation(validationConfig);
+  setupUI(userData);
   initPopups();
   renderInitialCards();
   setupEventListeners();
@@ -65,10 +67,12 @@ function init() {
 }
 
 // Настройка интерфейса
-function setupUI() {
+function setupUI(data) {
   // Устанавливаем логотип и аватар
   elements.logo.src = logo;
-  elements.avatar.style.backgroundImage = `url(${avatar})`;
+  elements.avatar.style.backgroundImage = `url(${data.avatar})`;
+  elements.name.textContent = data.name;
+  elements.job.textContent = data.about;
 
   // Добавляем анимацию для всех попапов
   document.querySelectorAll(".popup").forEach((popup) => {
