@@ -53,3 +53,17 @@ export const deleteCardApi = (cardId) => {
     headers: config.headers,
   }).then(respHandel);
 };
+
+export const likeCardApi = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: "PUT",
+    headers: config.headers,
+  }).then(respHandel);
+};
+
+export const unlikeCardApi = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  }).then(respHandel);
+};
