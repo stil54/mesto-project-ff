@@ -5,14 +5,12 @@ import "./vendor/normalize.css";
 
 // Импорт изображений
 import logo from "./images/logo.svg";
-import avatar from "./images/avatar.jpg";
 
 // Импорт модулей
-import { initialCards } from "./components/cards.js";
 import { createCard, likeCard, deleteCard } from "./components/card.js";
 import { initPopups, openPopup, closePopup } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
-import { getUserInfo } from "./components/api.js";
+import { getUserInfo, getInitialCards } from "./components/api.js";
 
 // DOM элементы
 const elements = {
@@ -54,14 +52,22 @@ const validationConfig = {
   errorClass: "popup__error_visible",
 };
 
-const userData = await getUserInfo();
+// Получаем данные пользователя
+// const userData = await getUserInfo();
+// const userCards = await getInitialCards();
+
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([user, cards]) => {
+    setupUI(user);
+    renderInitialCards(cards, user._id);
+  })
 
 // Инициализация приложения
 function init() {
   enableValidation(validationConfig);
-  setupUI(userData);
+  // setupUI(userData);
   initPopups();
-  renderInitialCards();
+  // renderInitialCards();
   setupEventListeners();
   console.log("Приложение успешно запущено!");
 }
@@ -81,14 +87,14 @@ function setupUI(data) {
 }
 
 // Рендер начальных карточек
-function renderInitialCards() {
-  initialCards.forEach((card) => {
-    elements.cardList.append(createCardElement(card));
+function renderInitialCards(cards, userId) {
+  cards.forEach((card) => {
+    elements.cardList.append(createCardElement(card, userId));
   });
 }
 
 // Создание карточки
-function createCardElement(cardData) {
+function createCardElement(cardData, userId) {
   return createCard({
     template: elements.cardTemplate,
     data: cardData,
@@ -97,6 +103,7 @@ function createCardElement(cardData) {
       like: likeCard,
       image: () => openImagePopup(cardData.link, cardData.name),
     },
+    userId: userId,
   });
 }
 
