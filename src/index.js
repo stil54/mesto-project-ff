@@ -14,6 +14,7 @@ import {
   getUserInfo,
   getInitialCards,
   updateProfile,
+  newCardApi,
 } from "./components/api.js";
 
 // DOM элементы
@@ -59,8 +60,10 @@ const validationConfig = {
 // Получаем данные пользователя
 // const userData = await getUserInfo();
 // const userCards = await getInitialCards();
+let currentUser = null;
 
 Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
+  currentUser = user;
   setupUI(user);
   renderInitialCards(cards, user._id);
 });
@@ -166,14 +169,34 @@ function handleEditSubmit(evt) {
 function handleAddCardSubmit(evt) {
   evt.preventDefault();
 
-  const newCard = createCardElement({
-    name: inputs.placeName.value,
-    link: inputs.imageLink.value,
-  });
+  const submitButton = evt.submitter;
+  const originalText = submitButton.textContent;
+  
+  // UI feedback
+  submitButton.disabled = true;
+  submitButton.textContent = 'Создание...';
+  
+  const name = inputs.placeName.value.trim();
+  const link = inputs.imageLink.value.trim();
 
-  elements.cardList.prepend(newCard);
-  forms.addCard.reset();
-  closePopup();
+  newCardApi(name, link)
+    .then(newCard => {
+      // Создаем и добавляем карточку из ответа сервера
+      console.log(newCard)
+      const cardElement = createCardElement(newCard, currentUser._id);
+      elements.cardList.prepend(cardElement);
+      
+      // Закрываем попап и сбрасываем форму
+      forms.addCard.reset();
+      closePopup(elements.addModal);
+    })
+    .catch(error => {
+      console.error('Ошибка при создании карточки:', error);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    });
 }
 
 // Открытие изображения

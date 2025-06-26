@@ -11,7 +11,7 @@ const respHandel = (res) => {
     return res.json();
   }
   return Promise.reject(`Ошибка: ${res.status}`);
-}
+};
 
 export const getUserInfo = () => {
   return fetch(`${config.baseUrl}/users/me`, {
@@ -19,19 +19,30 @@ export const getUserInfo = () => {
   }).then(respHandel);
 };
 
-export const getInitialCards = () => {  
-  return fetch(`${config.baseUrl}/cards`, {  
-    headers: config.headers,  
+export const getInitialCards = () => {
+  return fetch(`${config.baseUrl}/cards`, {
+    headers: config.headers,
   }).then(respHandel);
-};  
+};
 
-export const updateProfile = (name, about) => {  
-  return fetch(`${config.baseUrl}/users/me`, {  
+export const updateProfile = (name, about) => {
+  return fetch(`${config.baseUrl}/users/me`, {
     method: "PATCH",
-    headers: config.headers, 
-    body: JSON.stringify({  
-      name: name,  
-      about: about,  
-    }), 
+    headers: config.headers,
+    body: JSON.stringify({
+      name: name,
+      about: about,
+    }),
+  }).then(respHandel);
+};
+
+export const newCardApi = (name, link) => {
+  return fetch(`${config.baseUrl}/cards`, {
+    method: "POST",
+    headers: config.headers,
+    body: JSON.stringify({
+      name: name,
+      link: link,
+    }),
   }).then(respHandel);
 };
