@@ -10,7 +10,11 @@ import logo from "./images/logo.svg";
 import { createCard, likeCard, deleteCard } from "./components/card.js";
 import { initPopups, openPopup, closePopup } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
-import { getUserInfo, getInitialCards } from "./components/api.js";
+import {
+  getUserInfo,
+  getInitialCards,
+  updateProfile,
+} from "./components/api.js";
 
 // DOM элементы
 const elements = {
@@ -56,18 +60,15 @@ const validationConfig = {
 // const userData = await getUserInfo();
 // const userCards = await getInitialCards();
 
-Promise.all([getUserInfo(), getInitialCards()])
-  .then(([user, cards]) => {
-    setupUI(user);
-    renderInitialCards(cards, user._id);
-  })
+Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
+  setupUI(user);
+  renderInitialCards(cards, user._id);
+});
 
 // Инициализация приложения
 function init() {
   enableValidation(validationConfig);
-  // setupUI(userData);
   initPopups();
-  // renderInitialCards();
   setupEventListeners();
   console.log("Приложение успешно запущено!");
 }
@@ -133,9 +134,32 @@ function handleEditClick() {
 // Обработка сохранения профиля
 function handleEditSubmit(evt) {
   evt.preventDefault();
-  elements.name.textContent = inputs.name.value;
-  elements.job.textContent = inputs.description.value;
-  closePopup();
+
+  const submitButton = evt.submitter;
+  const originalText = submitButton.textContent;
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Сохранение...";
+
+  const newName = inputs.name.value.trim();
+  const newDescription = inputs.description.value.trim();
+
+  updateProfile(newName, newDescription)
+    .then((updatedUser) => {
+      // Обновляем UI
+      elements.name.textContent = updatedUser.name;
+      elements.job.textContent = updatedUser.about;
+
+      // Закрываем попап
+      closePopup(elements.editModal);
+    })
+    .catch((error) => {
+      console.error("Ошибка:", error);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    });
 }
 
 // Обработка добавления карточки
