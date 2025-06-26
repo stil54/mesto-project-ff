@@ -6,28 +6,29 @@ export const createCard = ({ template, data, handlers, userId }) => {
   const likeCount = cardElement.querySelector(".card__like-count");
 
   // Заполнение данными
-  const { name, link, likes, owner } = data;
+  const { name, link, likes = [], owner } = data;
   const { delete: deleteHandler, like, image } = handlers;
+  cardElement.dataset.cardId = data._id;
 
   cardElement.querySelector(".card__title").textContent = name;
   cardImage.src = link;
   cardImage.alt = name;
-  
+
   // Установка количества лайков
   likeCount.textContent = likes.length;
-  
+
   // Проверка, лайкнул ли текущий пользователь карточку
-  if (likes.some(like => like._id === userId)) {
+  if (likes.some((like) => like._id === userId)) {
     likeButton.classList.add("card__like-button_is-active");
   }
-  
-  // Показывать кнопку удаления только для своих карточек
-  if (owner._id !== userId) {
-    deleteButton.style.display = 'none';
-  }
 
+  deleteButton.style.display = owner._id === userId ? "block" : "none";
+
+  // Показывать кнопку удаления только для своих карточек
+  if (owner._id === userId) {
+    deleteButton.addEventListener("click", () => deleteHandler(cardElement));
+  }
   // Обработчики событий
-  deleteButton.addEventListener("click", () => deleteHandler(cardElement));
   likeButton.addEventListener("click", like);
   cardImage.addEventListener("click", image);
 
@@ -41,16 +42,16 @@ export const deleteCard = (cardElement) => {
 
 export const likeCard = (event) => {
   const likeButton = event.target;
-  const cardElement = likeButton.closest('.card');
-  const likeCount = cardElement.querySelector('.card__like-count');
+  const cardElement = likeButton.closest(".card");
+  const likeCount = cardElement.querySelector(".card__like-count");
 
-  const isLiked = likeButton.classList.contains('card__like-button_is-active');
-  
+  const isLiked = likeButton.classList.contains("card__like-button_is-active");
+
   if (isLiked) {
-    likeButton.classList.remove('card__like-button_is-active');
+    likeButton.classList.remove("card__like-button_is-active");
     likeCount.textContent = parseInt(likeCount.textContent) - 1;
   } else {
-    likeButton.classList.add('card__like-button_is-active');
+    likeButton.classList.add("card__like-button_is-active");
     likeCount.textContent = parseInt(likeCount.textContent) + 1;
   }
 };

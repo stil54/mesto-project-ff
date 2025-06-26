@@ -15,6 +15,7 @@ import {
   getInitialCards,
   updateProfile,
   newCardApi,
+  deleteCardApi,
 } from "./components/api.js";
 
 // DOM элементы
@@ -103,7 +104,7 @@ function createCardElement(cardData, userId) {
     template: elements.cardTemplate,
     data: cardData,
     handlers: {
-      delete: deleteCard,
+      delete: handleDeleteCard,
       like: likeCard,
       image: () => openImagePopup(cardData.link, cardData.name),
     },
@@ -171,33 +172,78 @@ function handleAddCardSubmit(evt) {
 
   const submitButton = evt.submitter;
   const originalText = submitButton.textContent;
-  
+
   // UI feedback
   submitButton.disabled = true;
-  submitButton.textContent = 'Создание...';
-  
+  submitButton.textContent = "Создание...";
+
   const name = inputs.placeName.value.trim();
   const link = inputs.imageLink.value.trim();
 
   newCardApi(name, link)
-    .then(newCard => {
+    .then((newCard) => {
       // Создаем и добавляем карточку из ответа сервера
-      console.log(newCard)
+      console.log(newCard);
       const cardElement = createCardElement(newCard, currentUser._id);
       elements.cardList.prepend(cardElement);
-      
+
       // Закрываем попап и сбрасываем форму
       forms.addCard.reset();
       closePopup(elements.addModal);
     })
-    .catch(error => {
-      console.error('Ошибка при создании карточки:', error);
+    .catch((error) => {
+      console.error("Ошибка при создании карточки:", error);
     })
     .finally(() => {
       submitButton.disabled = false;
       submitButton.textContent = originalText;
     });
 }
+
+// Удаление карточки
+elements.confirmModal = document.querySelector(".popup_type_confirm");
+elements.confirmForm = elements.confirmModal.querySelector(".popup__form");
+
+let cardToDelete = null;
+const handleDeleteCard = (cardElement) => {
+  if (!cardElement || !cardElement.dataset.cardId) {
+    console.error("Карточка для удаления не найдена");
+    return;
+  }
+
+  cardToDelete = cardElement;
+  openPopup(elements.confirmModal);
+};
+
+elements.confirmForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+
+  if (!cardToDelete || !cardToDelete.dataset.cardId) {
+    console.error("Нет карточки для удаления");
+    closePopup(elements.confirmModal);
+    return;
+  }
+
+  const cardId = cardToDelete.dataset.cardId;
+  const submitButton = evt.submitter;
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Удаление...";
+
+  deleteCardApi(cardId)
+    .then(() => {
+      cardToDelete.remove();
+      closePopup(elements.confirmModal);
+    })
+    .catch((err) => {
+      console.error("Ошибка при удалении карточки:", err);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = "Да";
+      cardToDelete = null;
+    });
+});
 
 // Открытие изображения
 function openImagePopup(imageSrc, title) {

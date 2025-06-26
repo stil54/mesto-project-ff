@@ -46,3 +46,10 @@ export const newCardApi = (name, link) => {
     }),
   }).then(respHandel);
 };
+
+export const deleteCardApi = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  }).then(respHandel);
+};
