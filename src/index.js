@@ -1,13 +1,11 @@
 // Импорт стилей
 import "./pages/index.css";
-import "./vendor/fonts.css";
-import "./vendor/normalize.css";
 
 // Импорт изображений
 import logo from "./images/logo.svg";
 
 // Импорт модулей
-import { createCard, likeCard, deleteCard } from "./components/card.js";
+import { createCard, likeCard } from "./components/card.js";
 import { initPopups, openPopup, closePopup } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
 import {
@@ -32,11 +30,11 @@ const elements = {
   addModal: document.querySelector(".popup_type_new-card"),
   name: document.querySelector(".profile__title"),
   job: document.querySelector(".profile__description"),
-  avatarPopup: document.querySelector('.popup_type_change-avatar'),
-  avatarForm: document.querySelector('.popup_type_change-avatar .popup__form'),
-  avatarInput: document.querySelector('#avatar-input'),
-  avatarImage: document.querySelector('.profile__image'),
-  avatarInputError: document.querySelector('.avatar-input-error')
+  avatarPopup: document.querySelector(".popup_type_change-avatar"),
+  avatarForm: document.querySelector(".popup_type_change-avatar .popup__form"),
+  avatarInput: document.querySelector("#avatar-input"),
+  avatarImage: document.querySelector(".profile__image"),
+  avatarInputError: document.querySelector(".avatar-input-error"),
 };
 
 // Формы
@@ -69,11 +67,15 @@ const validationConfig = {
 // const userCards = await getInitialCards();
 let currentUser = null;
 
-Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
-  currentUser = user;
-  setupUI(user);
-  renderInitialCards(cards, user._id);
-});
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([user, cards]) => {
+    currentUser = user;
+    setupUI(user);
+    renderInitialCards(cards, user._id);
+  })
+  .catch((err) => {
+    console.error("Ошибка при загрузке данных:", err);
+  });
 
 // Инициализация приложения
 function init() {
@@ -133,13 +135,14 @@ function setupEventListeners() {
   forms.addCard.addEventListener("submit", handleAddCardSubmit);
 
   // Обработчик клика по аватару
-  elements.avatarImage.addEventListener('click', () => {
+  elements.avatarImage.addEventListener("click", () => {
+    elements.avatarForm.reset();
     openPopup(elements.avatarPopup);
     clearValidation(elements.avatarForm, validationConfig);
   });
-  
+
   // Обработчик отправки формы аватара
-  elements.avatarForm.addEventListener('submit', handleAvatarSubmit);
+  elements.avatarForm.addEventListener("submit", handleAvatarSubmit);
 }
 
 // Обработчики событий
@@ -153,6 +156,8 @@ function handleEditClick() {
 // Обработка сохранения профиля
 function handleEditSubmit(evt) {
   evt.preventDefault();
+
+  if (!evt.target.checkValidity()) return;
 
   const submitButton = evt.submitter;
   const originalText = submitButton.textContent;
@@ -181,19 +186,18 @@ function handleEditSubmit(evt) {
     });
 }
 
-
 //обработчик отправки формы смены аватара
 function handleAvatarSubmit(evt) {
   evt.preventDefault();
-  
+
   const submitButton = evt.submitter;
   const originalText = submitButton.textContent;
   const avatarLink = elements.avatarInput.value.trim();
-  
+
   // UI feedback
   submitButton.disabled = true;
-  submitButton.textContent = 'Сохранение...';
-  
+  submitButton.textContent = "Сохранение...";
+
   updateAvatar(avatarLink)
     .then((userData) => {
       // Обновляем аватар из ответа сервера
@@ -202,15 +206,15 @@ function handleAvatarSubmit(evt) {
       elements.avatarForm.reset();
     })
     .catch((err) => {
-      console.error('Ошибка при обновлении аватара:', err);
-      elements.avatarInputError.textContent = 'Не удалось обновить аватар';
+      console.error("Ошибка при обновлении аватара:", err);
+      elements.avatarInputError.textContent = "Не удалось обновить аватар";
       elements.avatarInputError.classList.add(validationConfig.errorClass);
     })
     .finally(() => {
       submitButton.disabled = false;
       submitButton.textContent = originalText;
     });
-};
+}
 
 // Обработка добавления карточки
 function handleAddCardSubmit(evt) {

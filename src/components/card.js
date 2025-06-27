@@ -21,9 +21,6 @@ export const createCard = ({ template, data, handlers, userId }) => {
   elements.image.alt = name;
   elements.likeCount.textContent = likes.length;
 
-  // Установка количества лайков
-  elements.likeCount.textContent = likes.length;
-
   // Проверка, лайкнул ли текущий пользователь карточку
   if (likes.some((like) => like._id === userId)) {
     elements.likeButton.classList.add("card__like-button_is-active");

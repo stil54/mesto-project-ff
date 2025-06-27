@@ -1,6 +1,3 @@
-const regex = /^[A-Za-zа-яА-ЯёЁ0-9ёЁ -]+$/;
-const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-
 const hasInvalidInput = (inputList) => {
   return inputList.some((inputElement) => {
     return !inputElement.validity.valid;
@@ -27,16 +24,10 @@ const hideInputError = (formElement, inputElement, validationConfig) => {
 };
 
 const checkInputValidity = (formElement, inputElement, validationConfig) => {
-  inputElement.setCustomValidity("");
-
-  if (inputElement.validity.valueMissing) {
-    inputElement.setCustomValidity("Это обязательное поле");
-  } else if (inputElement.type === "url") {
-    if (!urlRegex.test(inputElement.value.trim())) {
-      inputElement.setCustomValidity(inputElement.dataset.error);
-    }
-  } else if (!regex.test(inputElement.value)) {
+  if (inputElement.validity.patternMismatch) {
     inputElement.setCustomValidity(inputElement.dataset.error);
+  } else {
+    inputElement.setCustomValidity("");
   }
 
   if (!inputElement.validity.valid) {
@@ -82,7 +73,6 @@ export const enableValidation = (validationConfig) => {
   );
 
   formList.forEach((formElement) => {
-    formElement.addEventListener("submit", (evt) => evt.preventDefault());
     setEventListeners(formElement, validationConfig);
   });
 };
